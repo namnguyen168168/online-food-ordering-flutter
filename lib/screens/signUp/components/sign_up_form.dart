@@ -38,7 +38,7 @@ class _SignUpFormState extends State<SignUpForm> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => const PghoneLoginScreen(),
+          builder: (_) => const SignInScreen(),
         ),
       );
     } else {
