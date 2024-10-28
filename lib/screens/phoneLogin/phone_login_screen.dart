@@ -20,7 +20,7 @@ class _PghoneLoginScreenState extends State<PghoneLoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Login to Foodly"),
+        title: const Text("Login to FoodSou"),
       ),
       body: SafeArea(
         child: Padding(
@@ -29,9 +29,9 @@ class _PghoneLoginScreenState extends State<PghoneLoginScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const WelcomeText(
-                title: "Get started with Foodly",
+                title: "Get started with FoodSou",
                 text:
-                    "Enter your phone number to use foodly \nand enjoy your food :)",
+                    "Enter your phone number to use foodSou \nand enjoy your food :)",
               ),
               const SizedBox(height: defaultPadding),
               Form(

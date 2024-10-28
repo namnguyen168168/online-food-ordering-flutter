@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:ordering_food_flutter/screens/auth/sign_in_screen.dart';
+import 'dart:convert';
 import '../../phoneLogin/phone_login_screen.dart';
-
 import '../../../constants.dart';
 
 class SignUpForm extends StatefulWidget {
@@ -12,8 +14,59 @@ class SignUpForm extends StatefulWidget {
 
 class _SignUpFormState extends State<SignUpForm> {
   final _formKey = GlobalKey<FormState>();
-
+  String? _fullName;
+  String? _email;
+  String? _password;
   bool _obscureText = true;
+
+  Future<void> _signUp() async {
+    final url = 'http://10.0.2.2:5454/auth/signup'; // Replace with your API endpoint
+
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({
+        'fullName': _fullName,
+        'email': _email,
+        'password': _password,
+        'role': 'CUSTOMER',
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      // Handle success
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const SignInScreen(),
+        ),
+      );
+    } else {
+      // Handle error
+      var message = "Error";
+      _showErrorDialog(message);
+    }}
+
+// Function to show error dialog
+    void _showErrorDialog(String message) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Sign Up Failed'),
+            content: Text(message),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +77,9 @@ class _SignUpFormState extends State<SignUpForm> {
           // Full Name Field
           TextFormField(
             validator: requiredValidator.call,
-            onSaved: (value) {},
+            onSaved: (value) {
+              _fullName = value;
+            },
             textInputAction: TextInputAction.next,
             decoration: const InputDecoration(hintText: "Full Name"),
           ),
@@ -33,7 +88,9 @@ class _SignUpFormState extends State<SignUpForm> {
           // Email Field
           TextFormField(
             validator: emailValidator.call,
-            onSaved: (value) {},
+            onSaved: (value) {
+              _email = value;
+            },
             textInputAction: TextInputAction.next,
             keyboardType: TextInputType.emailAddress,
             decoration: const InputDecoration(hintText: "Email Address"),
@@ -45,8 +102,9 @@ class _SignUpFormState extends State<SignUpForm> {
             obscureText: _obscureText,
             validator: passwordValidator.call,
             textInputAction: TextInputAction.next,
-            onChanged: (value) {},
-            onSaved: (value) {},
+            onSaved: (value) {
+              _password = value;
+            },
             decoration: InputDecoration(
               hintText: "Password",
               suffixIcon: GestureDetector(
@@ -81,15 +139,14 @@ class _SignUpFormState extends State<SignUpForm> {
             ),
           ),
           const SizedBox(height: defaultPadding),
+
           // Sign Up Button
           ElevatedButton(
             onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const PghoneLoginScreen(),
-                ),
-              );
+              if (_formKey.currentState!.validate()) {
+                _formKey.currentState!.save();
+                _signUp(); // Call the sign-up function
+              }
             },
             child: const Text("Sign Up"),
           ),
