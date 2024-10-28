@@ -29,7 +29,7 @@ class _SignUpFormState extends State<SignUpForm> {
         'fullName': _fullName,
         'email': _email,
         'password': _password,
-        'role': 'CUSTOMER',
+        'role': 'ROLE_CUSTOMER',
       }),
     );
 
@@ -38,7 +38,7 @@ class _SignUpFormState extends State<SignUpForm> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => const SignInScreen(),
+          builder: (_) => const PghoneLoginScreen(),
         ),
       );
     } else {

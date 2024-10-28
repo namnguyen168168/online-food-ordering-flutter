@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'The Flutter Way - Foodly UI Kit',
+      title: 'FoodSou',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: primaryColor),
         elevatedButtonTheme: ElevatedButtonThemeData(
