@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '../../components/cards/big/big_card_image_slide.dart';
 import '../../components/cards/big/restaurant_info_big_card.dart';
 import '../../components/section_title.dart';
@@ -10,9 +11,38 @@ import '../details/details_screen.dart';
 import '../featured/featurred_screen.dart';
 import 'components/medium_card_list.dart';
 import 'components/promotion_banner.dart';
+import 'restaurant.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  List<Restaurant> _restaurants = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchRestaurants();
+  }
+
+  Future<void> _fetchRestaurants() async {
+    final response = await http.get(Uri.parse('http://10.0.2.2:5454/api/restaurants'));
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      setState(() {
+        _restaurants = data.map((json) => Restaurant.fromJson(json)).toList();
+        _isLoading = false; // Update loading state
+      });
+    } else {
+      throw Exception('Failed to load restaurants');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,10 +53,7 @@ class HomeScreen extends StatelessWidget {
           children: [
             Text(
               "Delivery to".toUpperCase(),
-              style: Theme.of(context)
-                  .textTheme
-                  .bodySmall!
-                  .copyWith(color: primaryColor),
+              style: Theme.of(context).textTheme.bodySmall!.copyWith(color: primaryColor),
             ),
             const Text(
               "San Francisco",
@@ -74,7 +101,6 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(height: defaultPadding),
               const MediumCardList(),
               const SizedBox(height: 20),
-              // Banner
               const PromotionBanner(),
               const SizedBox(height: 20),
               SectionTitle(
@@ -92,30 +118,30 @@ class HomeScreen extends StatelessWidget {
               SectionTitle(title: "All Restaurants", press: () {}),
               const SizedBox(height: 16),
 
-              // Demo list of Big Cards
-              ...List.generate(
-                // For demo we use 4 items
-                3,
-                (index) => Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                      defaultPadding, 0, defaultPadding, defaultPadding),
-                  child: RestaurantInfoBigCard(
-                    // Images are List<String>
-                    images: demoBigImages..shuffle(),
-                    name: "McDonald's",
-                    rating: 4.3,
-                    numOfRating: 200,
-                    deliveryTime: 25,
-                    foodType: const ["Chinese", "American", "Deshi food"],
-                    press: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const DetailsScreen(),
+              // Check if loading
+              if (_isLoading)
+                Center(child: CircularProgressIndicator())
+              else
+              // Display list of restaurants
+                ..._restaurants.map((restaurant) {
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(defaultPadding, 0, defaultPadding, defaultPadding),
+                    child: RestaurantInfoBigCard(
+                      images: demoBigImages..shuffle(),
+                      name: restaurant.name,
+                      rating: restaurant.rating,
+                      numOfRating: restaurant.numOfRating,
+                      deliveryTime: restaurant.deliveryTime,
+                      foodType: restaurant.foodTypes,
+                      press: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const DetailsScreen(),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-              )
+                  );
+                }).toList(),
             ],
           ),
         ),

@@ -33,12 +33,12 @@ class _SignUpFormState extends State<SignUpForm> {
       }),
     );
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 201) {
       // Handle success
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => const SignInScreen(),
+          builder: (_) => const PghoneLoginScreen(),
         ),
       );
     } else {

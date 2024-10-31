@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_svg/flutter_svg.dart';
+
 import '../../entry_point.dart';
 
 import '../../components/buttons/secondery_button.dart';
@@ -34,8 +36,9 @@ class FindRestaurantsScreen extends StatelessWidget {
               const WelcomeText(
                 title: "Find restaurants near you ",
                 text:
-                    "Please enter your location or allow access to \nyour location to find restaurants near you.",
+                "Please enter your location or allow access to \nyour location to find restaurants near you.",
               ),
+
 
               // Getting Current Location
               SeconderyButton(
@@ -111,5 +114,6 @@ class FindRestaurantsScreen extends StatelessWidget {
         ),
       ),
     );
+
   }
 }
