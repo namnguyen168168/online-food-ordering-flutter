@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 import '../../components/cards/big/restaurant_info_big_card.dart';
 import '../../components/scalton/big_card_scalton.dart';
@@ -15,28 +17,38 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   bool _showSearchResult = false;
-  bool _isLoading = true;
+  bool _isLoading = false;
+  List<dynamic> _searchResults = [];
 
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(const Duration(seconds: 1), () {
-      setState(() {
-        _isLoading = false;
-      });
+  void showResult(String query) {
+    setState(() {
+      _isLoading = true; // Start loading
     });
+
+    // Fetch restaurants based on the query
+    _fetchRestaurants(query);
   }
 
-  void showResult() {
-    setState(() {
-      _isLoading = true;
-    });
-    Future.delayed(const Duration(seconds: 1), () {
+  Future<void> _fetchRestaurants(String query) async {
+    try {
+      final response = await http.get(Uri.parse('http://10.0.2.2:5454/api/restaurants'));
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        setState(() {
+          _searchResults = data; // Store the results
+          _showSearchResult = true; // Show search results
+          _isLoading = false; // Stop loading
+        });
+      } else {
+        throw Exception('Failed to load restaurants');
+      }
+    } catch (e) {
+      print("Error fetching restaurants: $e");
       setState(() {
-        _showSearchResult = true;
-        _isLoading = false;
+        _isLoading = false; // Stop loading on error
       });
-    });
+    }
   }
 
   @override
@@ -51,32 +63,27 @@ class _SearchScreenState extends State<SearchScreen> {
               const SizedBox(height: defaultPadding),
               Text('Search', style: Theme.of(context).textTheme.headlineMedium),
               const SizedBox(height: defaultPadding),
-              const SearchForm(),
+              SearchForm(showResult: showResult),
               const SizedBox(height: defaultPadding),
               Text(_showSearchResult ? "Search Results" : "Top Restaurants",
                   style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: defaultPadding),
               Expanded(
                 child: ListView.builder(
-                  itemCount: _isLoading ? 2 : 5, //5 is demo length of your data
+                  itemCount: _isLoading ? 2 : _searchResults.length,
                   itemBuilder: (context, index) => Padding(
                     padding: const EdgeInsets.only(bottom: defaultPadding),
                     child: _isLoading
                         ? const BigCardScalton()
                         : RestaurantInfoBigCard(
-                            // Images are List<String>
-                            images: demoBigImages..shuffle(),
-                            name: "McDonald's",
-                            rating: 4.3,
-                            numOfRating: 200,
-                            deliveryTime: 25,
-                            foodType: const [
-                              "Chinese",
-                              "American",
-                              "Deshi food"
-                            ],
-                            press: () {},
-                          ),
+                      images: demoBigImages..shuffle(),
+                      name: _searchResults[index]['name'],
+                      rating: _searchResults[index]['rating']?.toDouble() ?? 0.0,
+                      numOfRating: _searchResults[index]['numOfRating'] ?? 0,
+                      deliveryTime: _searchResults[index]['deliveryTime'] ?? 0,
+                      foodType: List<String>.from(_searchResults[index]['foodTypes'] ?? []),
+                      press: () {},
+                    ),
                   ),
                 ),
               ),
@@ -89,7 +96,9 @@ class _SearchScreenState extends State<SearchScreen> {
 }
 
 class SearchForm extends StatefulWidget {
-  const SearchForm({super.key});
+  final Function(String) showResult;
+
+  const SearchForm({super.key, required this.showResult});
 
   @override
   State<SearchForm> createState() => _SearchFormState();
@@ -97,24 +106,28 @@ class SearchForm extends StatefulWidget {
 
 class _SearchFormState extends State<SearchForm> {
   final _formKey = GlobalKey<FormState>();
+  String? _searchQuery;
+
   @override
   Widget build(BuildContext context) {
     return Form(
       key: _formKey,
       child: TextFormField(
         onChanged: (value) {
-          // get data while typing
-          // if (value.length >= 3) showResult();
+          _searchQuery = value; // Capture the input
         },
         onFieldSubmitted: (value) {
           if (_formKey.currentState!.validate()) {
-            // If all data are correct then save data to out variables
             _formKey.currentState!.save();
-
-            // Once user pree on submit
-          } else {}
+            widget.showResult(_searchQuery!); // Trigger search
+          }
         },
-        validator: requiredValidator.call,
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Please enter a search term';
+          }
+          return null; // Valid input
+        },
         style: Theme.of(context).textTheme.labelLarge,
         textInputAction: TextInputAction.search,
         decoration: InputDecoration(

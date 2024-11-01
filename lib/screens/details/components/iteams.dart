@@ -61,7 +61,7 @@ final List<Tab> demoTabs = <Tab>[
     child: Text('Most Populars'),
   ),
   const Tab(
-    child: Text('Beef & Lamb'),
+    child: Text('Main Course'),
   ),
   const Tab(
     child: Text('Seafood'),
@@ -70,7 +70,7 @@ final List<Tab> demoTabs = <Tab>[
     child: Text('Appetizers'),
   ),
   const Tab(
-    child: Text('Dim Sum'),
+    child: Text('Drinks'),
   ),
 ];
 
