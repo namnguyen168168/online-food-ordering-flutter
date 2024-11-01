@@ -7,6 +7,7 @@ import '../../components/section_title.dart';
 import '../../constants.dart';
 import '../../demo_data.dart';
 import '../../screens/filter/filter_screen.dart';
+import '../../screens/findRestaurants/find_restaurants_screen.dart';
 import '../details/details_screen.dart';
 import '../featured/featurred_screen.dart';
 import 'components/medium_card_list.dart';
@@ -23,6 +24,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<Restaurant> _restaurants = [];
   bool _isLoading = true;
+  String _selectedLocation = "San Francisco"; // Default location
 
   @override
   void initState() {
@@ -52,12 +54,12 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Column(
           children: [
             Text(
-              "Delivery to".toUpperCase(),
+              "Location".toUpperCase(),
               style: Theme.of(context).textTheme.bodySmall!.copyWith(color: primaryColor),
             ),
-            const Text(
-              "San Francisco",
-              style: TextStyle(color: Colors.black),
+            Text(
+              _selectedLocation, // Display the selected location
+              style: const TextStyle(color: Colors.black),
             )
           ],
         ),
@@ -73,6 +75,27 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             child: Text(
               "Filter",
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+          ),
+          TextButton(
+            onPressed: () async {
+              // Navigate to FindRestaurantsScreen and await the returned location
+              final location = await Navigator.push<String>(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const FindRestaurantsScreen(),
+                ),
+              );
+              // Update the selected location if a value is returned
+              if (location != null && location.isNotEmpty) {
+                setState(() {
+                  _selectedLocation = location; // Update location state
+                });
+              }
+            },
+            child: Text(
+              "Change Location",
               style: Theme.of(context).textTheme.bodyLarge,
             ),
           ),
