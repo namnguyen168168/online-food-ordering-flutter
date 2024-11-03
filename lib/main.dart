@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:ordering_food_flutter/screens/onboarding/onboarding_scrreen.dart';
 import 'constants.dart';
-import 'screens/onboarding/onboarding_scrreen.dart';
+
 
 void main() {
   runApp(const MyApp());
@@ -9,7 +10,6 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -27,8 +27,17 @@ class MyApp extends StatelessWidget {
           ),
         ),
         textTheme: const TextTheme(
-          bodyMedium: TextStyle(color: bodyTextColor),
-          bodySmall: TextStyle(color: bodyTextColor),
+          bodyLarge: TextStyle(
+            fontFamily: 'OpenSans',
+          ),
+          bodyMedium: TextStyle(
+            color: bodyTextColor,
+            fontFamily: 'OpenSans',// Add custom font here
+          ),
+          bodySmall: TextStyle(
+            color: bodyTextColor,
+            fontFamily: 'OpenSans',// Add custom font here
+          ),
         ),
         inputDecorationTheme: const InputDecorationTheme(
           contentPadding: EdgeInsets.all(defaultPadding),

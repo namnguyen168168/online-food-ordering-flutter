@@ -7,7 +7,7 @@ ThemeData buildThemeData() {
     primaryColor: accentColor,
 
     scaffoldBackgroundColor: Colors.white,
-    fontFamily: "Open_Sans",
+    fontFamily: "Roboto",
     // textTheme: textTheme().apply(displayColor: titleColor),
     appBarTheme: const AppBarTheme(
       color: Colors.white,
