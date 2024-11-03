@@ -7,6 +7,8 @@ import '../../components/cards/big/restaurant_info_big_card.dart';
 import '../../components/scalton/big_card_scalton.dart';
 import '../../constants.dart';
 import '../../demo_data.dart';
+import '../details/components/restaurrant_info.dart';
+
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -23,6 +25,7 @@ class _SearchScreenState extends State<SearchScreen> {
   void showResult(String query) {
     setState(() {
       _isLoading = true; // Start loading
+      _showSearchResult = false; // Reset search results
     });
 
     // Fetch restaurants based on the query
@@ -31,12 +34,18 @@ class _SearchScreenState extends State<SearchScreen> {
 
   Future<void> _fetchRestaurants(String query) async {
     try {
-      final response = await http.get(Uri.parse('http://10.0.2.2:5454/api/restaurants'));
+      final response = await http.get(Uri.parse('https://foodsou.store/api/restaurants'));
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
+
         setState(() {
-          _searchResults = data; // Store the results
+          // Filter the results based on the search query
+          _searchResults = data.where((restaurant) {
+            final name = restaurant['name'].toLowerCase();
+            return name.contains(query.toLowerCase()); // Check if the name contains the query
+          }).toList();
+
           _showSearchResult = true; // Show search results
           _isLoading = false; // Stop loading
         });
@@ -65,8 +74,10 @@ class _SearchScreenState extends State<SearchScreen> {
               const SizedBox(height: defaultPadding),
               SearchForm(showResult: showResult),
               const SizedBox(height: defaultPadding),
-              Text(_showSearchResult ? "Search Results" : "Top Restaurants",
-                  style: Theme.of(context).textTheme.titleLarge),
+              Text(
+                _showSearchResult ? "Search Results" : "Top Restaurants",
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
               const SizedBox(height: defaultPadding),
               Expanded(
                 child: ListView.builder(
@@ -78,11 +89,21 @@ class _SearchScreenState extends State<SearchScreen> {
                         : RestaurantInfoBigCard(
                       images: demoBigImages..shuffle(),
                       name: _searchResults[index]['name'],
-                      rating: _searchResults[index]['rating']?.toDouble() ?? 0.0,
-                      numOfRating: _searchResults[index]['numOfRating'] ?? 0,
+                      rating: (_searchResults[index]['rating']?.toDouble() ?? 0.0),
+                      numOfRating: _searchResults[index]['numOfRatings'] ?? 0,
                       deliveryTime: _searchResults[index]['deliveryTime'] ?? 0,
-                      foodType: List<String>.from(_searchResults[index]['foodTypes'] ?? []),
-                      press: () {},
+                      foodType: List<String>.from(_searchResults[index]['cuisineType'].split(', ')),
+                      press: () {
+                        // Navigate to restaurant detail
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => RestaurantInfo(
+                              restaurantId: _searchResults[index]['id'].toString(),
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ),

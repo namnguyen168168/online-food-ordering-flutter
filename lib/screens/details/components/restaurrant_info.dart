@@ -1,59 +1,121 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '../../../components/price_range_and_food_type.dart';
 import '../../../components/rating_with_counter.dart';
 import '../../../constants.dart';
+import '../../home/restaurant.dart';
+import 'featured_items.dart';
+import 'iteams.dart';
 
-class RestaurantInfo extends StatelessWidget {
-  const RestaurantInfo({
-    super.key,
-  });
+class RestaurantInfo extends StatefulWidget {
+  final String restaurantId; // Pass restaurant ID to fetch data
+
+  const RestaurantInfo({super.key, required this.restaurantId});
+
+  @override
+  _RestaurantInfoState createState() => _RestaurantInfoState();
+}
+
+class _RestaurantInfoState extends State<RestaurantInfo> {
+  Restaurant? restaurant;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchRestaurantData();
+  }
+
+  Future<void> _fetchRestaurantData() async {
+    try {
+      final response = await http.get(Uri.parse('https://foodsou.store/api/restaurants/${widget.restaurantId}'));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        setState(() {
+          restaurant = Restaurant.fromJson(data);
+          isLoading = false;
+        });
+      } else {
+        throw Exception('Failed to load restaurant');
+      }
+    } catch (e) {
+      print("Error fetching restaurant data: $e");
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Mayfield Bakery & Cafe",
-            style: Theme.of(context).textTheme.headlineMedium,
-            maxLines: 1,
-          ),
-          const SizedBox(height: defaultPadding / 2),
-          const PriceRangeAndFoodtype(
-            foodType: ["Chinese", "American", "Deshi food"],
-          ),
-          const SizedBox(height: defaultPadding / 2),
-          const RatingWithCounter(rating: 4.3, numOfRating: 200),
-          const SizedBox(height: defaultPadding),
-          Row(
-            children: [
-              const DeliveryInfo(
-                iconSrc: "assets/icons/delivery.svg",
-                text: "Free",
-                subText: "Delivery",
-              ),
-              const SizedBox(width: defaultPadding),
-              const DeliveryInfo(
-                iconSrc: "assets/icons/clock.svg",
-                text: "25",
-                subText: "Minutes",
-              ),
-              const Spacer(),
-              OutlinedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
+    if (isLoading) {
+      return Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (restaurant == null) {
+      return Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        body: Center(child: Text("No restaurant found")),
+      );
+    }
+
+    return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: AppBar(
+        title: Text("Restaurant Info"),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              restaurant!.name,
+              style: Theme.of(context).textTheme.headlineMedium,
+              maxLines: 1,
+            ),
+            const SizedBox(height: defaultPadding / 2),
+            PriceRangeAndFoodtype(foodType: restaurant!.foodTypes),
+            const SizedBox(height: defaultPadding / 2),
+            RatingWithCounter(rating: restaurant!.rating, numOfRating: restaurant!.numOfRatings),
+            const SizedBox(height: defaultPadding),
+            Row(
+              children: [
+                DeliveryInfo(
+                  iconSrc: "assets/icons/delivery.svg",
+                  text: restaurant!.deliveryInfo,
+                  subText: "Delivery",
                 ),
-                child: const Text("Take away"),
-              ),
-            ],
-          ),
-        ],
+                const SizedBox(width: defaultPadding),
+                DeliveryInfo(
+                  iconSrc: "assets/icons/clock.svg",
+                  text: restaurant!.deliveryTime.toString(),
+                  subText: "Minutes",
+                ),
+                const Spacer(),
+                OutlinedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: const Text("Take away"),
+                ),
+              ],
+            ),
+            const SizedBox(height: defaultPadding), // Add spacing before featured items
+            const FeaturedItems(), // Add FeaturedItems widget
+            const SizedBox(height: defaultPadding), // Add spacing before items
+            const Items(), // Add Items widget
+          ],
+        ),
       ),
     );
   }
@@ -91,10 +153,7 @@ class DeliveryInfo extends StatelessWidget {
             children: [
               TextSpan(
                 text: subText,
-                style: Theme.of(context)
-                    .textTheme
-                    .labelSmall!
-                    .copyWith(fontWeight: FontWeight.normal),
+                style: Theme.of(context).textTheme.labelSmall!.copyWith(fontWeight: FontWeight.normal),
               )
             ],
           ),

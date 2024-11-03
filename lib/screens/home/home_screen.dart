@@ -8,8 +8,9 @@ import '../../constants.dart';
 import '../../demo_data.dart';
 import '../../screens/filter/filter_screen.dart';
 import '../../screens/findRestaurants/find_restaurants_screen.dart';
-import '../details/details_screen.dart';
+import '../details/components/restaurrant_info.dart';
 import '../featured/featurred_screen.dart';
+import '../search/search_screen.dart';
 import 'components/medium_card_list.dart';
 import 'components/promotion_banner.dart';
 import 'restaurant.dart';
@@ -24,7 +25,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<Restaurant> _restaurants = [];
   bool _isLoading = true;
-  String _selectedLocation = "San Francisco"; // Default location
+  String _selectedLocation = "Ha Noi"; // Default location
 
   @override
   void initState() {
@@ -33,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _fetchRestaurants() async {
-    final response = await http.get(Uri.parse('http://10.0.2.2:5454/api/restaurants'));
+    final response = await http.get(Uri.parse('https://foodsou.store/api/restaurants'));
 
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
@@ -87,11 +88,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   builder: (context) => const FindRestaurantsScreen(),
                 ),
               );
-              // Update the selected location if a value is returned
+              // Check if location is not null or empty
               if (location != null && location.isNotEmpty) {
                 setState(() {
                   _selectedLocation = location; // Update location state
                 });
+              } else {
+                // Handle case where no location was returned
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("No location selected.")),
+                );
               }
             },
             child: Text(
@@ -122,23 +128,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               const SizedBox(height: defaultPadding),
-              const MediumCardList(),
-              const SizedBox(height: 20),
+
               const PromotionBanner(),
               const SizedBox(height: 20),
               SectionTitle(
-                title: "Best Pick",
+                title: "All Restaurants",
                 press: () => Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const FeaturedScreen(),
+                    builder: (context) => const SearchScreen(),
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
-              const MediumCardList(),
-              const SizedBox(height: 20),
-              SectionTitle(title: "All Restaurants", press: () {}),
               const SizedBox(height: 16),
 
               // Check if loading
@@ -153,13 +154,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       images: demoBigImages..shuffle(),
                       name: restaurant.name,
                       rating: restaurant.rating,
-                      numOfRating: restaurant.numOfRating,
+                      numOfRating: restaurant.numOfRatings,
                       deliveryTime: restaurant.deliveryTime,
                       foodType: restaurant.foodTypes,
                       press: () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const DetailsScreen(),
+                          builder: (context) => RestaurantInfo(restaurantId: restaurant.id.toString()), // Pass the restaurant ID
                         ),
                       ),
                     ),

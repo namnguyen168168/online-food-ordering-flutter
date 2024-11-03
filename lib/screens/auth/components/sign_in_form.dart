@@ -20,7 +20,7 @@ class _SignInFormState extends State<SignInForm> {
   bool _obscureText = true;
 
   Future<void> _signIn() async {
-    final url = 'http://10.0.2.2:5454/auth/signin'; // For Android Emulator // Replace with your API endpoint
+    final url = 'https://foodsou.store/api/auth/signin'; // For Android Emulator // Replace with your API endpoint
 
     final response = await http.post(
       Uri.parse(url),

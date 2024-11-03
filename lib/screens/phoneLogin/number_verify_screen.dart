@@ -6,13 +6,15 @@ import '../../constants.dart';
 import 'components/otp_form.dart';
 
 class NumberVerifyScreen extends StatelessWidget {
-  const NumberVerifyScreen({super.key});
+  final String phoneNumber;
+
+  const NumberVerifyScreen({super.key, required this.phoneNumber});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Login to Foodly"),
+        title: const Text("Login to FoodSou"),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -20,11 +22,10 @@ class NumberVerifyScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const WelcomeText(
+              WelcomeText(
                 title: "Verify phone number",
-                text: "Enter the 4-Digit code sent to you at \n+1501333982",
+                text: "Enter the 4-Digit code sent to you at \n$phoneNumber",
               ),
-
               // OTP form
               const OtpForm(),
               const SizedBox(height: defaultPadding),

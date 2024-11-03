@@ -1,25 +1,36 @@
 class Restaurant {
+  final String id;
   final String name;
-  final double rating;
-  final int numOfRating;
-  final int deliveryTime;
   final List<String> foodTypes;
+  final double rating;
+  final int numOfRatings;
+  final int deliveryTime;
+  final String description;
+  final String deliveryInfo;
 
   Restaurant({
+    required this.id,
     required this.name,
-    required this.rating,
-    required this.numOfRating,
-    required this.deliveryTime,
     required this.foodTypes,
+    required this.rating,
+    required this.numOfRatings,
+    required this.deliveryTime,
+    required this.description,
+    required this.deliveryInfo,
   });
 
   factory Restaurant.fromJson(Map<String, dynamic> json) {
     return Restaurant(
-      name: json['name'] ?? 'Unknown', // Default value if null
-      rating: (json['rating'] != null) ? json['rating'].toDouble() : 0.0, // Handle null
-      numOfRating: json['numOfRating'] ?? 0, // Default value if null
-      deliveryTime: json['deliveryTime'] ?? 0, // Default value if null
-      foodTypes: List<String>.from(json['foodTypes'] ?? []), // Handle null
+      id: json['id']?.toString() ?? "0", // Default ID to "0" if null
+      name: json['name'] ?? "Unknown Restaurant", // Default name
+      foodTypes: json['cuisineType'] != null
+          ? List<String>.from(json['cuisineType'].split(', '))
+          : [], // Default to empty list if null
+      rating: (json['rating'] != null) ? json['rating'].toDouble() : 0.0, // Default rating to 0.0
+      numOfRatings: json['numOfRatings'] ?? 0, // Default to 0 if null
+      deliveryTime: json['deliveryTime'] ?? 0, // Default to 0 minutes if null
+      description: json['description'] ?? "No description available", // Default description if null
+      deliveryInfo: json['deliveryInfo'] ?? "Free delivery", // Default to "Free" if null
     );
   }
 }

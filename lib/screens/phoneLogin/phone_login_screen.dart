@@ -14,8 +14,8 @@ class PghoneLoginScreen extends StatefulWidget {
 
 class _PghoneLoginScreenState extends State<PghoneLoginScreen> {
   final _formKey = GlobalKey<FormState>();
-
   String? phoneNumber;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,7 +31,7 @@ class _PghoneLoginScreenState extends State<PghoneLoginScreen> {
               const WelcomeText(
                 title: "Get started with FoodSou",
                 text:
-                    "Enter your phone number to use foodSou \nand enjoy your food :)",
+                "Enter your phone number to use FoodSou \nand enjoy your food :)",
               ),
               const SizedBox(height: defaultPadding),
               Form(
@@ -58,12 +58,12 @@ class _PghoneLoginScreenState extends State<PghoneLoginScreen> {
                 text: "Sign Up",
                 press: () {
                   if (_formKey.currentState!.validate()) {
-                    // If all data are correct then save data to out variables
+                    // If all data are correct then save data to variables
                     _formKey.currentState!.save();
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const NumberVerifyScreen(),
+                        builder: (context) => NumberVerifyScreen(phoneNumber: phoneNumber!),
                       ),
                     );
                   } else {}

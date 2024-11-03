@@ -20,7 +20,7 @@ class _SignUpFormState extends State<SignUpForm> {
   bool _obscureText = true;
 
   Future<void> _signUp() async {
-    final url = 'http://10.0.2.2:5454/auth/signup'; // Replace with your API endpoint
+    final url = 'https://foodsou.store/api/auth/signup'; // Replace with your API endpoint
 
     final response = await http.post(
       Uri.parse(url),

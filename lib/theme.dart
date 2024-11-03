@@ -7,7 +7,7 @@ ThemeData buildThemeData() {
     primaryColor: accentColor,
 
     scaffoldBackgroundColor: Colors.white,
-    fontFamily: "SF Pro Text",
+    fontFamily: "Open_Sans",
     // textTheme: textTheme().apply(displayColor: titleColor),
     appBarTheme: const AppBarTheme(
       color: Colors.white,

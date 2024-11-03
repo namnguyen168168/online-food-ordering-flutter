@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-
 import '../../../constants.dart';
 import 'featured_item_card.dart';
+import '../../addToOrder/add_to_order_screen.dart';
 
 class FeaturedItems extends StatelessWidget {
   const FeaturedItems({
@@ -25,14 +25,21 @@ class FeaturedItems extends StatelessWidget {
             children: [
               ...List.generate(
                 3, // for demo we use 3
-                (index) => Padding(
+                    (index) => Padding(
                   padding: const EdgeInsets.only(left: defaultPadding),
                   child: FeaturedItemCard(
                     title: "Cookie Sandwich",
-                    image: "assets/images/featured _items_${index + 1}.png",
-                    foodType: "Chines",
+                    image: "assets/images/thit_nuong.jpg",
+                    foodType: "Chinese",
                     priceRange: "\$" * 2,
-                    press: () {},
+                    press: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AddToOrderScrreen(),
+                        ),
+                      );
+                    }, // Updated press callback
                   ),
                 ),
               ),
