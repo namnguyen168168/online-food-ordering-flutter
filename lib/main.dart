@@ -28,15 +28,15 @@ class MyApp extends StatelessWidget {
         ),
         textTheme: const TextTheme(
           bodyLarge: TextStyle(
-            fontFamily: 'OpenSans',
+            fontFamily: 'Roboto',
           ),
           bodyMedium: TextStyle(
             color: bodyTextColor,
-            fontFamily: 'OpenSans',// Add custom font here
+            fontFamily: 'Roboto',// Add custom font here
           ),
           bodySmall: TextStyle(
             color: bodyTextColor,
-            fontFamily: 'OpenSans',// Add custom font here
+            fontFamily: 'Roboto',// Add custom font here
           ),
         ),
         inputDecorationTheme: const InputDecorationTheme(
