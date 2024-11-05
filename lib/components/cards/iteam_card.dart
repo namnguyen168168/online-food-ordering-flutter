@@ -7,18 +7,18 @@ import '../small_dot.dart';
 class ItemCard extends StatelessWidget {
   const ItemCard({
     super.key,
-    required this.title,
+    required this.name,
     required this.description,
     required this.image,
-    required this.foodType,
+    required this.foodCategory,
     required this.price,
-    required this.priceRange,
     required this.press,
   });
 
-  final String? title, description, image, foodType, priceRange;
-  final double? price;
+  final String? name, description, image, foodCategory;
+  final int price;
   final VoidCallback press;
+
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +52,7 @@ class ItemCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      title!,
+                      name!,
                       maxLines: 1,
                       style: Theme.of(context)
                           .textTheme
@@ -67,19 +67,16 @@ class ItemCard extends StatelessWidget {
                     ),
                     Row(
                       children: [
-                        Text(
-                          priceRange!,
-                          style: textStyle,
-                        ),
+
                         const Padding(
                           padding: EdgeInsets.symmetric(
                               horizontal: defaultPadding / 2),
                           child: SmallDot(),
                         ),
-                        Text(foodType!, style: textStyle),
+                        Text(foodCategory!, style: textStyle),
                         const Spacer(),
                         Text(
-                          "USD$price",
+                          "$price VND",
                           style: Theme.of(context)
                               .textTheme
                               .labelLarge!

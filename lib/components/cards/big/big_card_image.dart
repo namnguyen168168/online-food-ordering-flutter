@@ -15,7 +15,7 @@ class BigCardImage extends StatelessWidget {
         borderRadius: const BorderRadius.all(Radius.circular(12)),
         image: DecorationImage(
           // for newtowk image use NetworkImage()
-          image: AssetImage(image),
+          image: NetworkImage(image),
           fit: BoxFit.cover,
         ),
       ),

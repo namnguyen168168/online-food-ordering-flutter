@@ -10,7 +10,7 @@ class BigCardImageSlide extends StatefulWidget {
     required this.images,
   });
 
-  final List images;
+  final List<String> images;
 
   @override
   State<BigCardImageSlide> createState() => _BigCardImageSlideState();

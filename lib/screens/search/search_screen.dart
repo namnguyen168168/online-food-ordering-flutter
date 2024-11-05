@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
 import '../../components/cards/big/restaurant_info_big_card.dart';
 import '../../components/scalton/big_card_scalton.dart';
 import '../../constants.dart';
-import '../../demo_data.dart';
 import '../details/components/restaurrant_info.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -36,8 +34,14 @@ class _SearchScreenState extends State<SearchScreen> {
       final response = await http.get(Uri.parse('https://foodsou.store/api/restaurants'));
 
       if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
+        // Decode the response body
+        final decodedBody = utf8.decode(response.bodyBytes);
+        print('Decoded Response body: $decodedBody');
 
+        // Parse the JSON data
+        final List<dynamic> data = json.decode(decodedBody);
+
+        // Update the state with filtered search results
         setState(() {
           // Filter the results based on the search query
           _searchResults = data.where((restaurant) {
@@ -93,7 +97,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     child: _isLoading
                         ? const BigCardScalton()
                         : RestaurantInfoBigCard(
-                      images: demoBigImages..shuffle(),
+                      images: List<String>.from(_searchResults[index]['images'])..shuffle(),
                       name: _searchResults[index]['name'],
                       rating: (_searchResults[index]['rating']?.toDouble() ?? 0.0),
                       numOfRating: _searchResults[index]['numOfRatings'] ?? 0,

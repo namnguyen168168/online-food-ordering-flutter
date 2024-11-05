@@ -29,7 +29,14 @@ class _BodyState extends State<Body> {
       final response = await http.get(Uri.parse('https://foodsou.store/api/restaurants'));
 
       if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
+        // Decode the response body
+        final decodedBody = utf8.decode(response.bodyBytes);
+        print('Decoded Response body: $decodedBody');
+
+        // Parse the JSON data
+        final List<dynamic> data = json.decode(decodedBody);
+
+        // Update the state with the first four restaurants
         setState(() {
           _restaurants = data.take(4).toList(); // Take the first 4 restaurants
           isLoading = false; // Update loading state
@@ -58,7 +65,7 @@ class _BodyState extends State<Body> {
             child: isLoading
                 ? const BigCardScalton()
                 : RestaurantInfoBigCard(
-              images: demoBigImages..shuffle(), // Safely convert to List<String>
+              images: List<String>.from(_restaurants[index]['images'])..shuffle(), // Safely convert to List<String>
               name: _restaurants[index]['name'] as String,
               rating: (_restaurants[index]['rating'] as num?)?.toDouble() ?? 0.0, // Handle potential null
               numOfRating: (_restaurants[index]['numOfRatings'] as int?) ?? 0, // Handle potential null

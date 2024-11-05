@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import '../../components/cards/big/big_card_image_slide.dart';
 import '../../components/cards/big/restaurant_info_big_card.dart';
 import '../../components/section_title.dart';
 import '../../constants.dart';
-import '../../demo_data.dart';
 import '../../screens/filter/filter_screen.dart';
 import '../../screens/findRestaurants/find_restaurants_screen.dart';
 import '../details/components/restaurrant_info.dart';
 import '../featured/featurred_screen.dart';
 import '../search/search_screen.dart';
-import 'components/medium_card_list.dart';
 import 'components/promotion_banner.dart';
+import 'event_card.dart';
 import 'restaurant.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -24,26 +22,66 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List<Restaurant> _restaurants = [];
+  List<dynamic> _events = []; // List to store events
   bool _isLoading = true;
-  String _selectedLocation = "Ha Noi"; // Default location
+  bool _isEventsLoading = true; // Loading state for events
+  String _selectedLocation = "Hà Nội"; // Default location
 
   @override
   void initState() {
     super.initState();
     _fetchRestaurants();
+    _fetchEvents(); // Fetch events on initialization
   }
 
   Future<void> _fetchRestaurants() async {
-    final response = await http.get(Uri.parse('https://foodsou.store/api/restaurants'));
+    try {
+      final response = await http.get(Uri.parse('https://foodsou.store/api/restaurants'));
 
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
+      // Decode the response body
+      final decodedBody = utf8.decode(response.bodyBytes);
+      print('Decoded Response body: $decodedBody');
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(decodedBody);
+        setState(() {
+          _restaurants = data.map((json) => Restaurant.fromJson(json)).toList();
+          _isLoading = false; // Update loading state
+        });
+      } else {
+        throw Exception('Failed to load restaurants');
+      }
+    } catch (e) {
+      print('Error fetching restaurants: $e');
       setState(() {
-        _restaurants = data.map((json) => Restaurant.fromJson(json)).toList();
-        _isLoading = false; // Update loading state
+        _isLoading = false; // Stop loading
       });
-    } else {
-      throw Exception('Failed to load restaurants');
+    }
+  }
+
+  Future<void> _fetchEvents() async {
+    try {
+      final response = await http.get(Uri.parse('https://foodsou.store/api/public/event'));
+
+      if (response.statusCode == 200) {
+        // Decode the response body directly
+        final decodedBody = utf8.decode(response.bodyBytes);
+        print('Decoded Response body: $decodedBody'); // Debug output
+
+        // Parse the JSON data after decoding
+        final List<dynamic> data = json.decode(decodedBody);
+        setState(() {
+          _events = data; // Store events in the state
+          _isEventsLoading = false; // Update loading state for events
+        });
+      } else {
+        throw Exception('Failed to load events');
+      }
+    } catch (e) {
+      print('Error fetching events: $e');
+      setState(() {
+        _isEventsLoading = false; // Stop loading
+      });
     }
   }
 
@@ -59,7 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
               style: Theme.of(context).textTheme.bodySmall!.copyWith(color: primaryColor),
             ),
             Text(
-              _selectedLocation, // Display the selected location
+              _selectedLocation,
               style: const TextStyle(color: Colors.black),
             )
           ],
@@ -81,20 +119,17 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           TextButton(
             onPressed: () async {
-              // Navigate to FindRestaurantsScreen and await the returned location
               final location = await Navigator.push<String>(
                 context,
                 MaterialPageRoute(
                   builder: (context) => const FindRestaurantsScreen(),
                 ),
               );
-              // Check if location is not null or empty
               if (location != null && location.isNotEmpty) {
                 setState(() {
-                  _selectedLocation = location; // Update location state
+                  _selectedLocation = location;
                 });
               } else {
-                // Handle case where no location was returned
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text("No location selected.")),
                 );
@@ -113,10 +148,36 @@ class _HomeScreenState extends State<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: defaultPadding),
+
+              // Display events
+              const SizedBox(height: defaultPadding),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
-                child: BigCardImageSlide(images: demoBigImages),
+                child: Text(
+                  "Upcoming Events",
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
               ),
+              const SizedBox(height: defaultPadding),
+
+              // Check if loading events
+              if (_isEventsLoading)
+                Center(child: CircularProgressIndicator())
+              else
+              // Display list of events
+                ..._events.map((event) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: defaultPadding, vertical: 8.0),
+                    child: EventCard(
+                      title: event['title'],
+                      description: event['description'],
+                      image: event['image'],
+                      startAt: event['startAt'],
+                      endAt: event['endAt'],
+                    ),
+                  );
+                }),
+
               const SizedBox(height: defaultPadding * 2),
               SectionTitle(
                 title: "Featured Partners",
@@ -142,7 +203,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 16),
 
-              // Check if loading
+              // Check if loading restaurants
               if (_isLoading)
                 Center(child: CircularProgressIndicator())
               else
@@ -151,7 +212,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   return Padding(
                     padding: const EdgeInsets.fromLTRB(defaultPadding, 0, defaultPadding, defaultPadding),
                     child: RestaurantInfoBigCard(
-                      images: demoBigImages..shuffle(),
+                      images: restaurant.images.isNotEmpty ? restaurant.images : [],
                       name: restaurant.name,
                       rating: restaurant.rating,
                       numOfRating: restaurant.numOfRatings,
@@ -160,12 +221,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       press: () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => RestaurantInfo(restaurantId: restaurant.id.toString()), // Pass the restaurant ID
+                          builder: (context) => RestaurantInfo(restaurantId: restaurant.id.toString()),
                         ),
                       ),
                     ),
                   );
-                }).toList(),
+                }),
             ],
           ),
         ),

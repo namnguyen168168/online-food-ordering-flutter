@@ -8,7 +8,9 @@ import 'components/iteams.dart';
 import 'components/restaurrant_info.dart';
 
 class DetailsScreen extends StatelessWidget {
-  const DetailsScreen({super.key});
+  final String restaurantId; // Declare the restaurantId parameter
+
+  const DetailsScreen({super.key, required this.restaurantId}); // Make it required
 
   @override
   Widget build(BuildContext context) {
@@ -30,16 +32,16 @@ class DetailsScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: const SafeArea(
+      body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(height: defaultPadding / 2),
-              RestaurantInfo(restaurantId: '',),
+              RestaurantInfo(restaurantId: restaurantId), // Pass restaurantId here
               SizedBox(height: defaultPadding),
               FeaturedItems(),
-              Items(),
+              Items(restaurantId: restaurantId),
             ],
           ),
         ),

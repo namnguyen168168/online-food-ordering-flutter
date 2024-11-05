@@ -52,12 +52,7 @@ class _MediumCardListState extends State<MediumCardList> {
                       delivertTime: 25,
                       rating: 4.6,
                       press: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const DetailsScreen(),
-                          ),
-                        );
+
                       },
                     ),
                   ),

@@ -26,17 +26,26 @@ class RestaurantInfoBigCard extends StatelessWidget {
     required this.foodType,
     required this.press,
   });
+
   @override
   Widget build(BuildContext context) {
+    // Ensure there is at least one image to display
+    final imageToDisplay = images.isNotEmpty ? images : ['http://res.cloudinary.com/defqbfzkf/image/upload/v1730798080/tw3byf8fsdolpm3nept9.png']; // Placeholder image
+
     return InkWell(
       onTap: press,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // pass list of images here
-          BigCardImageSlide(images: images),
+          // Pass the list of images here
+          BigCardImageSlide(images: imageToDisplay),
           const SizedBox(height: defaultPadding / 2),
-          Text(name, style: Theme.of(context).textTheme.titleLarge),
+          Text(
+            name,
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontFamily: 'Roboto'),
+            maxLines: 1, // Limit to one line
+            overflow: TextOverflow.ellipsis, // Handle overflow
+          ),
           const SizedBox(height: defaultPadding / 4),
           PriceRangeAndFoodtype(foodType: foodType),
           const SizedBox(height: defaultPadding / 4),

@@ -32,8 +32,11 @@ class _RestaurantInfoState extends State<RestaurantInfo> {
     try {
       final response = await http.get(Uri.parse('https://foodsou.store/api/restaurants/${widget.restaurantId}'));
 
+      // Decode the response body
+      final decodedBody = utf8.decode(response.bodyBytes);
+      print('Decoded Response body: $decodedBody');
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+        final data = json.decode(decodedBody);
         setState(() {
           restaurant = Restaurant.fromJson(data);
           isLoading = false;
@@ -70,7 +73,7 @@ class _RestaurantInfoState extends State<RestaurantInfo> {
       appBar: AppBar(
         title: Text("Restaurant Info"),
       ),
-      body: Padding(
+      body: SingleChildScrollView( // Make the Column scrollable
         padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -113,7 +116,7 @@ class _RestaurantInfoState extends State<RestaurantInfo> {
             const SizedBox(height: defaultPadding), // Add spacing before featured items
             const FeaturedItems(), // Add FeaturedItems widget
             const SizedBox(height: defaultPadding), // Add spacing before items
-            const Items(), // Add Items widget
+            Items(restaurantId: widget.restaurantId), // Add Items widget
           ],
         ),
       ),

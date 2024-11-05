@@ -1,17 +1,61 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '../../../components/cards/iteam_card.dart';
 import '../../../constants.dart';
 import '../../addToOrder/add_to_order_screen.dart';
 
 class Items extends StatefulWidget {
-  const Items({super.key});
+  final String restaurantId; // Pass restaurant ID to fetch items
+
+  const Items({super.key, required this.restaurantId});
 
   @override
   State<Items> createState() => _ItemsState();
 }
 
-class _ItemsState extends State<Items> {
-  
+class _ItemsState extends State<Items> with SingleTickerProviderStateMixin {
+  List<dynamic> _menuItems = [];
+  bool _isLoading = true;
+  late TabController _tabController; // TabController for managing tabs
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchMenuItems();
+    _tabController = TabController(length: demoTabs.length, vsync: this);
+  }
+
+  Future<void> _fetchMenuItems() async {
+    try {
+      final response = await http.get(Uri.parse('https://foodsou.store/api/restaurants/food/${widget.restaurantId}'));
+
+      if (response.statusCode == 200) {
+        final decodedBody = utf8.decode(response.bodyBytes);
+        print('Decoded Response body: $decodedBody');
+
+        final List<dynamic> data = json.decode(decodedBody);
+        setState(() {
+          _menuItems = data; // Update the menu items
+          _isLoading = false; // Stop loading
+        });
+      } else {
+        throw Exception('Failed to load menu items');
+      }
+    } catch (e) {
+      print('Error fetching menu items: $e');
+      setState(() {
+        _isLoading = false; // Stop loading
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose(); // Dispose of the TabController
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -19,36 +63,51 @@ class _ItemsState extends State<Items> {
       children: [
         DefaultTabController(
           length: demoTabs.length,
-          child: TabBar(
-            isScrollable: true,
-            unselectedLabelColor: titleColor,
-            labelStyle: Theme.of(context).textTheme.titleLarge,
-            onTap: (value) {
-              // you will get selected tab index
-            },
-            tabs: demoTabs,
+          child: Column(
+            children: [
+              TabBar(
+                isScrollable: true,
+                unselectedLabelColor: titleColor,
+                labelStyle: Theme.of(context).textTheme.titleLarge,
+                indicatorColor: primaryColor, // Customize indicator color
+                tabs: demoTabs,
+              ),
+              SizedBox(height: defaultPadding), // Optional spacing below TabBar
+            ],
           ),
         ),
-        // SizedBox(height: defaultPadding),
-        ...List.generate(
-          demoData.length,
-          (index) => Padding(
-            padding: const EdgeInsets.symmetric(
-                horizontal: defaultPadding, vertical: defaultPadding / 2),
-            child: ItemCard(
-              title: demoData[index]["title"],
-              description: demoData[index]["description"],
-              image: demoData[index]["image"],
-              foodType: demoData[index]['foodType'],
-              price: demoData[index]["price"],
-              priceRange: demoData[index]["priceRange"],
-              press: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const AddToOrderScrreen(),
+        // Use a ListView directly for the items
+        _isLoading
+            ? Center(child: CircularProgressIndicator())
+            : _menuItems.isEmpty
+            ? Center(child: Text("No menu items available."))
+            : Expanded(
+          child: ListView.builder(
+            itemCount: _menuItems.length,
+            itemBuilder: (context, index) {
+              final item = _menuItems[index];
+              return Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: defaultPadding, vertical: defaultPadding / 2),
+                child: ItemCard(
+                  name: item['name'] ?? "No title available",
+                  description: item['description'] ?? "No description available",
+                  image: "assets/images/thit_nuong.jpg", // Default image if null
+                  foodCategory: item['foodType'] ?? "Unknown",
+                  price: (item['price'] is int)
+                      ? item['price'] as int
+                      : ((item['price'] as double?)?.toInt() ?? 0),
+                  press: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AddToOrderScrreen(),
+                      ),
+                    );
+                  },
                 ),
-              ),
-            ),
+              );
+            },
           ),
         ),
       ],
@@ -57,31 +116,9 @@ class _ItemsState extends State<Items> {
 }
 
 final List<Tab> demoTabs = <Tab>[
-  const Tab(
-    child: Text('Most Populars'),
-  ),
-  const Tab(
-    child: Text('Main Course'),
-  ),
-  const Tab(
-    child: Text('Seafood'),
-  ),
-  const Tab(
-    child: Text('Appetizers'),
-  ),
-  const Tab(
-    child: Text('Drinks'),
-  ),
+  const Tab(child: Text('Most Populars')),
+  const Tab(child: Text('Main Course')),
+  const Tab(child: Text('Seafood')),
+  const Tab(child: Text('Appetizers')),
+  const Tab(child: Text('Drinks')),
 ];
-
-final List<Map<String, dynamic>> demoData = List.generate(
-  3,
-  (index) => {
-    "image": "assets/images/featured _items_${index + 1}.png",
-    "title": "Cookie Sandwich",
-    "description": "Shortbread, chocolate turtle cookies, and red velvet.",
-    "price": 7.4,
-    "foodType": "Chinese",
-    "priceRange": "\$" * 2,
-  },
-);
