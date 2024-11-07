@@ -154,7 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
                 child: Text(
-                  "Upcoming Events",
+                  "FoodSou Events",
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
               ),

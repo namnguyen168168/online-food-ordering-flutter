@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../constants.dart';
-
 import '../small_dot.dart';
 
 class ItemCard extends StatelessWidget {
@@ -9,23 +8,23 @@ class ItemCard extends StatelessWidget {
     super.key,
     required this.name,
     required this.description,
-    required this.image,
+    required this.images,
     required this.foodCategory,
     required this.price,
     required this.press,
   });
 
-  final String? name, description, image, foodCategory;
+  final String? name, description, images, foodCategory;
   final int price;
   final VoidCallback press;
-
 
   @override
   Widget build(BuildContext context) {
     TextStyle textStyle = Theme.of(context).textTheme.labelLarge!.copyWith(
-          color: titleColor.withOpacity(0.64),
-          fontWeight: FontWeight.normal,
-        );
+      color: titleColor.withOpacity(0.64),
+      fontWeight: FontWeight.normal,
+    );
+
     return InkWell(
       borderRadius: const BorderRadius.all(Radius.circular(8)),
       onTap: press,
@@ -39,9 +38,22 @@ class ItemCard extends StatelessWidget {
                 aspectRatio: 1,
                 child: ClipRRect(
                   borderRadius: const BorderRadius.all(Radius.circular(8)),
-                  child: Image.asset(
-                    image!,
+                  child: Image.network(
+                    images!, // Load image from network
                     fit: BoxFit.cover,
+                    loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Center(
+                        child: CircularProgressIndicator(
+                          value: loadingProgress.expectedTotalBytes != null
+                              ? loadingProgress.cumulativeBytesLoaded / (loadingProgress.expectedTotalBytes ?? 1)
+                              : null,
+                        ),
+                      );
+                    },
+                    errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+                      return Center(child: Icon(Icons.error)); // Placeholder for error
+                    },
                   ),
                 ),
               ),
@@ -67,7 +79,6 @@ class ItemCard extends StatelessWidget {
                     ),
                     Row(
                       children: [
-
                         const Padding(
                           padding: EdgeInsets.symmetric(
                               horizontal: defaultPadding / 2),
@@ -81,7 +92,7 @@ class ItemCard extends StatelessWidget {
                               .textTheme
                               .labelLarge!
                               .copyWith(color: primaryColor),
-                        )
+                        ),
                       ],
                     ),
                   ],

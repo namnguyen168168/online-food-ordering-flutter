@@ -58,41 +58,48 @@ class _ItemsState extends State<Items> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        DefaultTabController(
-          length: demoTabs.length,
-          child: Column(
-            children: [
-              TabBar(
-                isScrollable: true,
-                unselectedLabelColor: titleColor,
-                labelStyle: Theme.of(context).textTheme.titleLarge,
-                indicatorColor: primaryColor, // Customize indicator color
-                tabs: demoTabs,
-              ),
-              SizedBox(height: defaultPadding), // Optional spacing below TabBar
-            ],
+    return SingleChildScrollView( // Use SingleChildScrollView for scrolling
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          DefaultTabController(
+            length: demoTabs.length,
+            child: Column(
+              children: [
+                TabBar(
+                  isScrollable: true,
+                  unselectedLabelColor: titleColor,
+                  labelStyle: Theme.of(context).textTheme.titleLarge,
+                  indicatorColor: primaryColor, // Customize indicator color
+                  tabs: demoTabs,
+                ),
+                SizedBox(height: defaultPadding), // Optional spacing below TabBar
+              ],
+            ),
           ),
-        ),
-        // Use a ListView directly for the items
-        _isLoading
-            ? Center(child: CircularProgressIndicator())
-            : _menuItems.isEmpty
-            ? Center(child: Text("No menu items available."))
-            : Expanded(
-          child: ListView.builder(
+          // Use a ListView directly for the items
+          _isLoading
+              ? Center(child: CircularProgressIndicator())
+              : _menuItems.isEmpty
+              ? Center(child: Text("No menu items available."))
+              : ListView.builder(
+            physics: NeverScrollableScrollPhysics(), // Disable scrolling for inner ListView
+            shrinkWrap: true, // Wrap ListView to take only the needed space
             itemCount: _menuItems.length,
             itemBuilder: (context, index) {
               final item = _menuItems[index];
+
+              // Handle the images field
+              final images = item['images'];
+              final imageUrl = (images is List && images.isNotEmpty) ? images[0] : "assets/images/thit_nuong.jpg";
+
               return Padding(
                 padding: const EdgeInsets.symmetric(
                     horizontal: defaultPadding, vertical: defaultPadding / 2),
                 child: ItemCard(
                   name: item['name'] ?? "No title available",
                   description: item['description'] ?? "No description available",
-                  image: "assets/images/thit_nuong.jpg", // Default image if null
+                  images: imageUrl, // Use the selected image URL
                   foodCategory: item['foodType'] ?? "Unknown",
                   price: (item['price'] is int)
                       ? item['price'] as int
@@ -109,8 +116,8 @@ class _ItemsState extends State<Items> with SingleTickerProviderStateMixin {
               );
             },
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

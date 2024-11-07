@@ -7,7 +7,6 @@ class EventCard extends StatelessWidget {
   final String startAt;
   final String endAt;
 
-
   const EventCard({
     Key? key,
     required this.title,
@@ -15,13 +14,13 @@ class EventCard extends StatelessWidget {
     required this.image,
     required this.startAt,
     required this.endAt,
-
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 220, // Set a fixed height for the card
+      // Set a height for the card if necessary, or make it dynamic
+      // height: 250,
       child: Card(
         elevation: 2,
         child: Column(
@@ -43,7 +42,7 @@ class EventCard extends StatelessWidget {
                 title,
                 style: Theme.of(context).textTheme.titleLarge,
                 overflow: TextOverflow.ellipsis, // Prevent title overflow
-                maxLines: 1, // Limit to one line
+                maxLines: 2, // Allow title to take up to two lines
               ),
             ),
             Padding(
@@ -56,10 +55,20 @@ class EventCard extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-              child: Text(
-                'From: $startAt To: $endAt',
-                maxLines: 1, // Limit to one line
-                overflow: TextOverflow.ellipsis, // Prevent overflow
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'From: $startAt',
+                    maxLines: 1, // Limit to one line
+                    overflow: TextOverflow.ellipsis, // Prevent overflow
+                  ),
+                  Text(
+                    'To: $endAt',
+                    maxLines: 1, // Limit to one line
+                    overflow: TextOverflow.ellipsis, // Prevent overflow
+                  ),
+                ],
               ),
             ),
           ],
