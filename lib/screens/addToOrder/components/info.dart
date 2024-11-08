@@ -6,7 +6,18 @@ import '../../../constants.dart';
 class Info extends StatelessWidget {
   const Info({
     super.key,
+    required this.name,
+    required this.description,
+    required this.images,
+    required this.foodCategory,
+    required this.price,
   });
+
+  final String name;
+  final String description;
+  final String images;
+  final String foodCategory;
+  final int price;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +37,7 @@ class Info extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Cookie Sandwich",
+              Text(name,
                   style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: 8),
               Text(

@@ -8,7 +8,7 @@ class TotalPrice extends StatelessWidget {
     required this.price,
   });
 
-  final double price;
+  final int price;
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +28,7 @@ class TotalPrice extends StatelessWidget {
           ),
         ),
         Text(
-          "\$$price",
+          "$price VND",
           style:
               const TextStyle(color: titleColor, fontWeight: FontWeight.w500),
         ),

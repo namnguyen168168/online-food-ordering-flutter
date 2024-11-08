@@ -178,7 +178,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 }),
 
-              const SizedBox(height: defaultPadding * 2),
+              const SizedBox(height: defaultPadding),
               SectionTitle(
                 title: "Featured Partners",
                 press: () => Navigator.push(

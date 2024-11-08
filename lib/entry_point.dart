@@ -16,10 +16,8 @@ class EntryPoint extends StatefulWidget {
 }
 
 class _EntryPointState extends State<EntryPoint> {
-  // Bydefault first one is selected
   int _selectedIndex = 0;
 
-  // List of nav items
   final List<Map<String, dynamic>> _navitems = [
     {"icon": "assets/icons/home.svg", "title": "Home"},
     {"icon": "assets/icons/search.svg", "title": "Search"},
@@ -27,18 +25,18 @@ class _EntryPointState extends State<EntryPoint> {
     {"icon": "assets/icons/profile.svg", "title": "Profile"},
   ];
 
-// Screens
-  final List<Widget> _screens = [
+  // Screens
+  final List<Widget> _screens;
+
+  _EntryPointState() : _screens = [
     const HomeScreen(),
     const SearchScreen(),
-    const OrderDetailsScreen(),
+    OrderDetailsScreen(orderedItems: []), // Pass an empty list here
     const ProfileScreen(),
   ];
 
   @override
   Widget build(BuildContext context) {
-    /// If you set your home screen as first screen make sure call [SizeConfig().init(context)]
-
     return Scaffold(
       body: _screens[_selectedIndex],
       bottomNavigationBar: CupertinoTabBar(

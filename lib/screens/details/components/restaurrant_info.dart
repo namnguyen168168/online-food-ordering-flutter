@@ -113,8 +113,8 @@ class _RestaurantInfoState extends State<RestaurantInfo> {
                 ),
               ],
             ),
-            const SizedBox(height: defaultPadding), // Add spacing before featured items
-            const FeaturedItems(), // Add FeaturedItems widget
+
+
             const SizedBox(height: defaultPadding), // Add spacing before items
             Items(restaurantId: widget.restaurantId), // Add Items widget
           ],

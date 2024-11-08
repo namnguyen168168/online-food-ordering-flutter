@@ -39,7 +39,7 @@ class ItemCard extends StatelessWidget {
                 child: ClipRRect(
                   borderRadius: const BorderRadius.all(Radius.circular(8)),
                   child: Image.network(
-                    images!, // Load image from network
+                    images!,
                     fit: BoxFit.cover,
                     loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
                       if (loadingProgress == null) return child;
@@ -52,7 +52,7 @@ class ItemCard extends StatelessWidget {
                       );
                     },
                     errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
-                      return Center(child: Icon(Icons.error)); // Placeholder for error
+                      return Center(child: Icon(Icons.error));
                     },
                   ),
                 ),
@@ -80,11 +80,16 @@ class ItemCard extends StatelessWidget {
                     Row(
                       children: [
                         const Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: defaultPadding / 2),
+                          padding: EdgeInsets.symmetric(horizontal: defaultPadding / 2),
                           child: SmallDot(),
                         ),
-                        Text(foodCategory!, style: textStyle),
+                        Flexible( // Use Flexible to allow space adjustments
+                          child: Text(
+                            foodCategory!,
+                            style: textStyle,
+                            overflow: TextOverflow.ellipsis, // Ensure it doesn't overflow
+                          ),
+                        ),
                         const Spacer(),
                         Text(
                           "$price VND",

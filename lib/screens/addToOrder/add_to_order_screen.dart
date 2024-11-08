@@ -1,25 +1,31 @@
 import 'package:flutter/material.dart';
-
 import '../../constants.dart';
 import '../orderDetails/order_details_screen.dart';
 import 'components/info.dart';
 import 'components/required_section_title.dart';
 import 'components/rounded_checkedbox_list_tile.dart';
 
-// ignore: must_be_immutable
 class AddToOrderScrreen extends StatefulWidget {
-  const AddToOrderScrreen({super.key});
+  final String name;
+  final String description;
+  final String images;
+  final String foodCategory;
+  final int price;
+
+  const AddToOrderScrreen({
+    super.key,
+    required this.name,
+    required this.description,
+    required this.images,
+    required this.foodCategory,
+    required this.price,
+  });
 
   @override
   State<AddToOrderScrreen> createState() => _AddToOrderScrreenState();
 }
 
 class _AddToOrderScrreenState extends State<AddToOrderScrreen> {
-  // for demo we select 2nd one
-  int choiceOfTopCookie = 1;
-
-  int choiceOfBottomCookie = 1;
-
   int numOfItems = 1;
 
   @override
@@ -48,45 +54,30 @@ class _AddToOrderScrreenState extends State<AddToOrderScrreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Info(),
+              const SizedBox(height: defaultPadding),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: defaultPadding, vertical: 8.0),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.network(
+                    widget.images,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
               const SizedBox(height: defaultPadding),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const RequiredSectionTitle(title: "Choice of top Cookie"),
+                    Text(widget.name, style: Theme.of(context).textTheme.titleLarge),
+                    const SizedBox(height: 4),
+                    Text(widget.foodCategory, style: TextStyle(color: bodyTextColor)),
                     const SizedBox(height: defaultPadding),
-                    ...List.generate(
-                      choiceOfTopCookies.length,
-                      (index) => RoundedCheckboxListTile(
-                        isActive: index == choiceOfTopCookie,
-                        text: choiceOfTopCookies[index],
-                        press: () {
-                          setState(() {
-                            choiceOfTopCookie = index;
-                          });
-                        },
-                      ),
-                    ),
+                    Text(widget.description),
                     const SizedBox(height: defaultPadding),
-                    const RequiredSectionTitle(
-                        title: "Choice of Bottom Cookie"),
-                    const SizedBox(height: defaultPadding),
-                    ...List.generate(
-                      choiceOfTopCookies.length,
-                      (index) => RoundedCheckboxListTile(
-                        isActive: index == choiceOfBottomCookie,
-                        text: choiceOfTopCookies[index],
-                        press: () {
-                          setState(() {
-                            choiceOfBottomCookie = index;
-                          });
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: defaultPadding),
-                    // // Num of item
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -94,7 +85,11 @@ class _AddToOrderScrreenState extends State<AddToOrderScrreen> {
                           height: 40,
                           width: 40,
                           child: ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              setState(() {
+                                if (numOfItems > 1) numOfItems--;
+                              });
+                            },
                             style: ElevatedButton.styleFrom(
                               shape: const CircleBorder(),
                               padding: EdgeInsets.zero,
@@ -103,8 +98,7 @@ class _AddToOrderScrreenState extends State<AddToOrderScrreen> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: defaultPadding),
+                          padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
                           child: Text(numOfItems.toString().padLeft(2, "0"),
                               style: Theme.of(context).textTheme.titleLarge),
                         ),
@@ -112,7 +106,11 @@ class _AddToOrderScrreenState extends State<AddToOrderScrreen> {
                           height: 40,
                           width: 40,
                           child: ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              setState(() {
+                                numOfItems++;
+                              });
+                            },
                             style: ElevatedButton.styleFrom(
                               shape: const CircleBorder(),
                               padding: EdgeInsets.zero,
@@ -125,14 +123,24 @@ class _AddToOrderScrreenState extends State<AddToOrderScrreen> {
                     const SizedBox(height: defaultPadding),
                     ElevatedButton(
                       onPressed: () {
+                        // Prepare selected item data
+                        final selectedItem = {
+                          "title": widget.name,
+                          "price": widget.price,
+                          "numOfItem": numOfItems,
+                        };
+
+                        // Navigate to OrderDetailsScreen with the new item
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const OrderDetailsScreen(),
+                            builder: (context) => OrderDetailsScreen(
+                              orderedItems: [selectedItem], // Pass the item in a list
+                            ),
                           ),
                         );
                       },
-                      child: const Text("Add to Order (\$11.98)"),
+                      child: Text("Add to Order (${(widget.price * numOfItems).toString()} VND)"),
                     ),
                   ],
                 ),
@@ -144,15 +152,4 @@ class _AddToOrderScrreenState extends State<AddToOrderScrreen> {
       ),
     );
   }
-
-  List<String> choiceOfTopCookies = [
-    "Choice of top Cookie",
-    "Cookies and Cream",
-    "Funfetti",
-    "M and M",
-    "Red Velvet",
-    "Peanut Butter",
-    "Snickerdoodle",
-    "White Chocolate Macadamia",
-  ];
 }

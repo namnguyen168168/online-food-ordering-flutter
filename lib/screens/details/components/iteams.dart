@@ -16,14 +16,37 @@ class Items extends StatefulWidget {
 
 class _ItemsState extends State<Items> with SingleTickerProviderStateMixin {
   List<dynamic> _menuItems = [];
+  List<dynamic> _categories = [];
   bool _isLoading = true;
   late TabController _tabController; // TabController for managing tabs
+  int _selectedCategoryIndex = 0; // Track the selected category index
 
   @override
   void initState() {
     super.initState();
+    _fetchCategories(); // Fetch categories on initialization
     _fetchMenuItems();
-    _tabController = TabController(length: demoTabs.length, vsync: this);
+  }
+
+  Future<void> _fetchCategories() async {
+    try {
+      final response = await http.get(Uri.parse('https://foodsou.store/api/restaurants/category/${widget.restaurantId}'));
+
+      if (response.statusCode == 200) {
+        final decodedBody = utf8.decode(response.bodyBytes);
+        print('Decoded Categories Response body: $decodedBody');
+
+        final List<dynamic> data = json.decode(decodedBody);
+        setState(() {
+          _categories = data; // Update the categories
+          _tabController = TabController(length: data.length + 1, vsync: this); // +1 for the "Menu" tab
+        });
+      } else {
+        throw Exception('Failed to load categories');
+      }
+    } catch (e) {
+      print('Error fetching categories: $e');
+    }
   }
 
   Future<void> _fetchMenuItems() async {
@@ -32,7 +55,7 @@ class _ItemsState extends State<Items> with SingleTickerProviderStateMixin {
 
       if (response.statusCode == 200) {
         final decodedBody = utf8.decode(response.bodyBytes);
-        print('Decoded Response body: $decodedBody');
+        print('Decoded Menu Items Response body: $decodedBody');
 
         final List<dynamic> data = json.decode(decodedBody);
         setState(() {
@@ -62,8 +85,10 @@ class _ItemsState extends State<Items> with SingleTickerProviderStateMixin {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          DefaultTabController(
-            length: demoTabs.length,
+          _categories.isEmpty
+              ? Center(child: CircularProgressIndicator())
+              : DefaultTabController(
+            length: _categories.length + 1, // +1 for the "Menu" tab
             child: Column(
               children: [
                 TabBar(
@@ -71,7 +96,16 @@ class _ItemsState extends State<Items> with SingleTickerProviderStateMixin {
                   unselectedLabelColor: titleColor,
                   labelStyle: Theme.of(context).textTheme.titleLarge,
                   indicatorColor: primaryColor, // Customize indicator color
-                  tabs: demoTabs,
+                  onTap: (index) {
+                    setState(() {
+                      _selectedCategoryIndex = index; // Set category index directly
+                    });
+                  },
+                  tabs: [
+                    const Tab(child: Text('Menu')), // Add "Menu" tab
+                  ]..addAll(_categories.map((category) {
+                    return Tab(child: Text(category['name'])); // Assuming each category has a 'name' field
+                  }).toList()),
                 ),
                 SizedBox(height: defaultPadding), // Optional spacing below TabBar
               ],
@@ -93,27 +127,39 @@ class _ItemsState extends State<Items> with SingleTickerProviderStateMixin {
               final images = item['images'];
               final imageUrl = (images is List && images.isNotEmpty) ? images[0] : "assets/images/thit_nuong.jpg";
 
-              return Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: defaultPadding, vertical: defaultPadding / 2),
-                child: ItemCard(
-                  name: item['name'] ?? "No title available",
-                  description: item['description'] ?? "No description available",
-                  images: imageUrl, // Use the selected image URL
-                  foodCategory: item['foodType'] ?? "Unknown",
-                  price: (item['price'] is int)
-                      ? item['price'] as int
-                      : ((item['price'] as double?)?.toInt() ?? 0),
-                  press: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const AddToOrderScrreen(),
-                      ),
-                    );
-                  },
-                ),
-              );
+              // Extract food category name from the nested object
+              final foodCategory = item['foodCategory']['name'] ?? "Unknown";
+
+              // Show all items when the "Menu" tab is selected (index 0)
+              if (_selectedCategoryIndex == 0 ||
+                  (item['foodCategory']['id'] == _categories[_selectedCategoryIndex - 1]['id'])) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: defaultPadding, vertical: defaultPadding / 2),
+                  child: ItemCard(
+                    name: item['name'] ?? "No title available",
+                    description: item['description'] ?? "No description available",
+                    images: imageUrl, // Use the selected image URL
+                    foodCategory: foodCategory, // Use the extracted food category name
+                    price: (item['price'] is int) ? item['price'] as int : ((item['price'] as double?)?.toInt() ?? 0),
+                    press: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AddToOrderScrreen(
+                            name: item['name'],
+                            description: item['description'],
+                            images: imageUrl,
+                            foodCategory: foodCategory,
+                            price: (item['price'] is int) ? item['price'] as int : ((item['price'] as double?)?.toInt() ?? 0),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              }
+              return Container(); // Skip if not showing
             },
           ),
         ],
@@ -121,11 +167,3 @@ class _ItemsState extends State<Items> with SingleTickerProviderStateMixin {
     );
   }
 }
-
-final List<Tab> demoTabs = <Tab>[
-  const Tab(child: Text('Most Populars')),
-  const Tab(child: Text('Main Course')),
-  const Tab(child: Text('Seafood')),
-  const Tab(child: Text('Appetizers')),
-  const Tab(child: Text('Drinks')),
-];

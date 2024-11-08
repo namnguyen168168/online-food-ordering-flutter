@@ -7,10 +7,20 @@ import 'components/price_row.dart';
 import 'components/total_price.dart';
 
 class OrderDetailsScreen extends StatelessWidget {
-  const OrderDetailsScreen({super.key});
+  final List<Map<String, dynamic>> orderedItems; // Accept ordered items
+
+  const OrderDetailsScreen({super.key, required this.orderedItems}); // Keep this required
 
   @override
   Widget build(BuildContext context) {
+    // Calculate subtotal as int
+    int subtotal = orderedItems.fold(0, (sum, item) {
+      // Ensure both price and numOfItem are treated as int
+      int price = item['price'] is int ? item['price'] : (item['price'] as num).toInt();
+      int numOfItem = item['numOfItem'] is int ? item['numOfItem'] : (item['numOfItem'] as num).toInt();
+      return sum + (price * numOfItem);
+    });
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Your Orders"),
@@ -23,27 +33,25 @@ class OrderDetailsScreen extends StatelessWidget {
               const SizedBox(height: defaultPadding),
               // List of cart items
               ...List.generate(
-                demoItems.length,
-                (index) => Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: defaultPadding / 2),
+                orderedItems.length,
+                    (index) => Padding(
+                  padding: const EdgeInsets.symmetric(vertical: defaultPadding / 2),
                   child: OrderedItemCard(
-                    title: demoItems[index]["title"],
-                    description:
-                        "Shortbread, chocolate turtle cookies, and red velvet.",
-                    numOfItem: demoItems[index]["numOfItem"],
-                    price: demoItems[index]["price"].toDouble(),
+                    title: orderedItems[index]["title"],
+
+                    numOfItem: orderedItems[index]["numOfItem"],
+                    price: orderedItems[index]["price"], // Use int price directly
                   ),
                 ),
               ),
-              const PriceRow(text: "Subtotal", price: 28.0),
+              PriceRow(text: "Subtotal", price: subtotal), // Update subtotal price
               const SizedBox(height: defaultPadding / 2),
               const PriceRow(text: "Delivery", price: 0),
               const SizedBox(height: defaultPadding / 2),
-              const TotalPrice(price: 20),
+              TotalPrice(price: subtotal), // Display the computed subtotal
               const SizedBox(height: defaultPadding * 2),
               PrimaryButton(
-                text: "Checkout (\$20.10)",
+                text: "Checkout (${subtotal} VND)", // Display subtotal as int
                 press: () {},
               ),
             ],
@@ -53,21 +61,3 @@ class OrderDetailsScreen extends StatelessWidget {
     );
   }
 }
-
-const List<Map> demoItems = [
-  {
-    "title": "Cookie Sandwich",
-    "price": 7.4,
-    "numOfItem": 1,
-  },
-  {
-    "title": "Combo Burger",
-    "price": 12,
-    "numOfItem": 1,
-  },
-  {
-    "title": "Oyster Dish",
-    "price": 8.6,
-    "numOfItem": 2,
-  },
-];

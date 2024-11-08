@@ -33,13 +33,7 @@ class FeaturedItems extends StatelessWidget {
                     foodType: "Chinese",
                     priceRange: "\$" * 2,
                     press: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const AddToOrderScrreen(),
-                        ),
-                      );
-                    }, // Updated press callback
+                      }, // Updated press callback
                   ),
                 ),
               ),

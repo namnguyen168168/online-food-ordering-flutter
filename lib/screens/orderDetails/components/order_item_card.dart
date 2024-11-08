@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../../../constants.dart';
 
 class OrderedItemCard extends StatelessWidget {
@@ -7,12 +6,12 @@ class OrderedItemCard extends StatelessWidget {
     super.key,
     required this.numOfItem,
     required this.title,
-    required this.description,
     required this.price,
   });
+
   final int numOfItem;
-  final String? title, description;
-  final double? price;
+  final String? title;
+  final int price; // Change price to int
 
   @override
   Widget build(BuildContext context) {
@@ -32,23 +31,18 @@ class OrderedItemCard extends StatelessWidget {
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   const SizedBox(height: defaultPadding / 4),
-                  Text(
-                    description!,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  )
+
                 ],
               ),
             ),
             const SizedBox(width: defaultPadding / 2),
             Text(
-              "USD$price",
+              "$price VND", // No change needed here, price is now int
               style: Theme.of(context)
                   .textTheme
                   .labelSmall!
                   .copyWith(color: primaryColor),
-            )
+            ),
           ],
         ),
         const SizedBox(height: defaultPadding / 2),
