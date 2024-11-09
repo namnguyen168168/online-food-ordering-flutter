@@ -33,7 +33,7 @@ class _AddToOrderScrreenState extends State<AddToOrderScrreen> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        title: Text("Add To Order"),
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
           child: ElevatedButton(
@@ -55,6 +55,7 @@ class _AddToOrderScrreenState extends State<AddToOrderScrreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: defaultPadding),
+              const SizedBox(height: 100),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: defaultPadding, vertical: 8.0),
                 child: ClipRRect(
