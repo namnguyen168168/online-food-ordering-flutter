@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // Import the intl package
+import 'package:intl/intl.dart';
 import '../../components/buttons/primary_button.dart';
 import '../../constants.dart';
 import 'check_out.dart';

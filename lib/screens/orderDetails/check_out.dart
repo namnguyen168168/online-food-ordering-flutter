@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // Import the intl package
-import 'credit_card_payment_screen.dart'; // Import your payment screen
+import 'package:intl/intl.dart';
+import 'credit_card_payment_screen.dart';
 
 class CheckoutScreen extends StatefulWidget {
   final List<Map<String, dynamic>> orderedItems;

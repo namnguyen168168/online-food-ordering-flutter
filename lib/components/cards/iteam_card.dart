@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // Import intl package
+import 'package:intl/intl.dart';
 
 import '../../constants.dart';
 import '../small_dot.dart';
