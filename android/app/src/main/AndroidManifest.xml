@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="ordering_food_flutter"
+        android:label="FoodSou"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

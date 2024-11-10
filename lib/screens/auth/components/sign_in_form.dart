@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../../findRestaurants/find_restaurants_screen.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../constants.dart';
 import '../forgot_password_screen.dart';
 
@@ -32,14 +32,28 @@ class _SignInFormState extends State<SignInForm> {
     );
 
     if (response.statusCode == 200) {
-      // Handle success
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const FindRestaurantsScreen(),
-        ),
-            (_) => false,
-      );
+      final responseData = json.decode(response.body);
+
+      // Check if the JWT token is in the response
+      if (responseData != null && responseData['jwt'] != null) {
+        String jwtToken = responseData['jwt'];
+
+        // Print the token to the console for debugging
+        print('JWT Token: $jwtToken');
+
+        // Save the token to local storage
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('jwt_token', jwtToken);
+
+        // Handle success (navigate to another screen)
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const FindRestaurantsScreen(),
+          ),
+              (_) => false,
+        );
+      }
     } else {
       var message = "Wrong password";
       // Handle error

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class OrderHistoryScreen extends StatefulWidget {
   const OrderHistoryScreen({super.key});
@@ -11,47 +11,65 @@ class OrderHistoryScreen extends StatefulWidget {
 }
 
 class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
-  List<Order> orders = [];
+  List<dynamic> orders = [];
   bool isLoading = true;
   String? errorMessage;
-
-  final FlutterSecureStorage storage = FlutterSecureStorage();
 
   @override
   void initState() {
     super.initState();
-    fetchOrderHistory();
+    _fetchUserOrders();
   }
 
-  Future<void> fetchOrderHistory() async {
-    try {
-      // Retrieve the JWT token
-      String? jwtToken = await storage.read(key: 'jwt_token');
+  Future<void> _fetchUserOrders() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? jwtToken = prefs.getString('jwt_token');
 
-      // Make the API request with the token in the headers
+    if (jwtToken == null) {
+      setState(() {
+        isLoading = false;
+        errorMessage = 'Token not found. Please sign in again.';
+      });
+      return;
+    }
+
+    try {
       final response = await http.get(
-        Uri.parse('https://foodsou.store/api/order/user'),
+        Uri.parse('https://foodsou.store/api/order/user'), // Replace with your actual endpoint
         headers: {
-          'Authorization': 'Bearer $jwtToken', // Include the token in the headers
+          'Authorization': 'Bearer $jwtToken',
+          'Content-Type': 'application/json',
         },
       );
 
+      // Decode the response body using utf8
+      final decodedBody = utf8.decode(response.bodyBytes);
+      print('Decoded Response body: $decodedBody');
+
       if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
+        final data = json.decode(decodedBody);
+
+        // Sort orders by createdAt date in descending order
+        data.sort((a, b) {
+          DateTime dateA = DateTime.parse(a['createdAt']);
+          DateTime dateB = DateTime.parse(b['createdAt']);
+          return dateB.compareTo(dateA); // New to old
+        });
+
         setState(() {
-          orders = data.map((order) => Order.fromJson(order)).toList();
+          orders = data; // Ensure this matches your API response structure
           isLoading = false;
         });
       } else {
         setState(() {
-          errorMessage = 'Failed to load orders';
           isLoading = false;
+          errorMessage = 'Failed to load orders. Status code: ${response.statusCode}';
         });
       }
     } catch (e) {
       setState(() {
-        errorMessage = 'An error occurred: $e';
         isLoading = false;
+        errorMessage = 'An error occurred: $e';
       });
     }
   }
@@ -63,38 +81,43 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
         title: const Text("Order History"),
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
-          : errorMessage != null
-          ? Center(child: Text(errorMessage!))
-          : ListView.builder(
+          ? const Center(child: CircularProgressIndicator())
+          : orders.isNotEmpty
+          ? ListView.builder(
         itemCount: orders.length,
         itemBuilder: (context, index) {
           final order = orders[index];
           return Card(
-            margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-            child: ListTile(
-              title: Text('Order ID: ${order.id}'),
-              subtitle: Text('Total: ${order.total} VND\nDate: ${order.date}'),
+            margin: const EdgeInsets.all(8.0),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Date: ${order['createdAt'] != null ? DateTime.parse(order['createdAt']).toLocal().toString() : 'N/A'}',
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  Text('Total Price: ${order['totalAmount'] ?? 'N/A'} VND'),
+                  const SizedBox(height: 8),
+                  Text('Delivery Address: ${order['deliveryAddress'] != null ? '${order['deliveryAddress']['streetAddress']}, ${order['deliveryAddress']['district']}, ${order['deliveryAddress']['city']}' : 'N/A'}'),
+                  const SizedBox(height: 8),
+                  Text('Phone: ${order['customer']['phone'] ?? 'N/A'}'),
+                  const SizedBox(height: 8),
+                  Text('Status: ${order['orderStatus'] ?? 'N/A'}'),
+                ],
+              ),
             ),
           );
         },
+      )
+          : Center(
+        child: Text(
+          errorMessage ?? 'No orders found.',
+          style: const TextStyle(fontSize: 16, color: Colors.red),
+        ),
       ),
-    );
-  }
-}
-
-class Order {
-  final int id;
-  final double total;
-  final String date;
-
-  Order({required this.id, required this.total, required this.date});
-
-  factory Order.fromJson(Map<String, dynamic> json) {
-    return Order(
-      id: json['id'],
-      total: json['total'],
-      date: json['created_at'], // Adjust this key based on the API response
     );
   }
 }
