@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart'; // Import the intl package
 import 'credit_card_payment_screen.dart'; // Import your payment screen
 
 class CheckoutScreen extends StatefulWidget {
@@ -20,6 +21,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Format the price using NumberFormat
+    final NumberFormat currencyFormat = NumberFormat('#,##0', 'vi_VN'); // Vietnamese format
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Checkout"),
@@ -30,7 +34,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Total Amount: ${widget.subtotal} VND',
+              'Total Amount: ${currencyFormat.format(widget.subtotal)} VND', // Use formatted subtotal
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
@@ -42,7 +46,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   return ListTile(
                     title: Text(widget.orderedItems[index]['title']),
                     subtitle: Text('Quantity: ${widget.orderedItems[index]['numOfItem']}'),
-                    trailing: Text('${widget.orderedItems[index]['price']} VND'),
+                    trailing: Text('${currencyFormat.format(widget.orderedItems[index]['price'])} VND'), // Use formatted price
                   );
                 },
               ),

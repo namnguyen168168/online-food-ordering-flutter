@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart'; // Import intl package
 
 import '../../constants.dart';
 import '../small_dot.dart';
@@ -24,6 +25,10 @@ class ItemCard extends StatelessWidget {
       color: titleColor.withOpacity(0.64),
       fontWeight: FontWeight.normal,
     );
+
+    // Format the price using NumberFormat
+    final NumberFormat currencyFormat = NumberFormat('#,##0', 'vi_VN'); // Vietnamese format
+    String formattedPrice = currencyFormat.format(price);
 
     return InkWell(
       borderRadius: const BorderRadius.all(Radius.circular(8)),
@@ -83,16 +88,16 @@ class ItemCard extends StatelessWidget {
                           padding: EdgeInsets.symmetric(horizontal: defaultPadding / 2),
                           child: SmallDot(),
                         ),
-                        Flexible( // Use Flexible to allow space adjustments
+                        Flexible(
                           child: Text(
                             foodCategory!,
                             style: textStyle,
-                            overflow: TextOverflow.ellipsis, // Ensure it doesn't overflow
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                         const Spacer(),
                         Text(
-                          "$price VND",
+                          "$formattedPrice VND", // Use formatted price
                           style: Theme.of(context)
                               .textTheme
                               .labelLarge!

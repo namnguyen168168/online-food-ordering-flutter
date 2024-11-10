@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import '../../../constants.dart';
+import 'order_history.dart';
 import 'profile_information_screen.dart';
 import 'change_password_screen.dart';
 import 'payment_methods_screen.dart';
@@ -28,6 +29,19 @@ class Body extends StatelessWidget {
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
               const SizedBox(height: 16),
+              ProfileMenuCard(
+                svgSrc: "assets/icons/order.svg",
+                title: "Order History",
+                subTitle: "View purchase history",
+                press: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const OrderHistoryScreen(),
+                    ),
+                  );
+                },
+              ),
               ProfileMenuCard(
                 svgSrc: "assets/icons/profile.svg",
                 title: "Profile Information",

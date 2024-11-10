@@ -216,7 +216,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       name: restaurant.name,
                       rating: restaurant.rating,
                       numOfRating: restaurant.numOfRatings,
-                      deliveryTime: restaurant.deliveryTime,
                       foodType: restaurant.foodTypes,
                       press: () => Navigator.push(
                         context,

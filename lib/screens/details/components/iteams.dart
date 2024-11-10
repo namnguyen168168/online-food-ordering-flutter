@@ -146,7 +146,7 @@ class _ItemsState extends State<Items> with SingleTickerProviderStateMixin {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => AddToOrderScrreen(
+                          builder: (context) => AddToOrderScreen(
                             name: item['name'],
                             description: item['description'],
                             images: imageUrl,

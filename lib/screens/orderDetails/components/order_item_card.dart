@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../../constants.dart';
 
 class OrderedItemCard extends StatelessWidget {
@@ -11,10 +12,14 @@ class OrderedItemCard extends StatelessWidget {
 
   final int numOfItem;
   final String? title;
-  final int price; // Change price to int
+  final int price; // Price as int
 
   @override
   Widget build(BuildContext context) {
+    // Format the price using NumberFormat
+    final NumberFormat currencyFormat = NumberFormat('#,##0', 'vi_VN'); // Vietnamese format
+    String formattedPrice = currencyFormat.format(price);
+
     return Column(
       children: [
         Row(
@@ -31,13 +36,12 @@ class OrderedItemCard extends StatelessWidget {
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   const SizedBox(height: defaultPadding / 4),
-
                 ],
               ),
             ),
             const SizedBox(width: defaultPadding / 2),
             Text(
-              "$price VND", // No change needed here, price is now int
+              "$formattedPrice VND", // Use formatted price
               style: Theme.of(context)
                   .textTheme
                   .labelSmall!

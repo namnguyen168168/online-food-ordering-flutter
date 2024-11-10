@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart'; // Import the intl package
+
 import '../../constants.dart';
 import '../orderDetails/order_details_screen.dart';
-import 'components/info.dart';
-import 'components/required_section_title.dart';
-import 'components/rounded_checkedbox_list_tile.dart';
 
-class AddToOrderScrreen extends StatefulWidget {
+class AddToOrderScreen extends StatefulWidget {
   final String name;
   final String description;
   final String images;
   final String foodCategory;
   final int price;
 
-  const AddToOrderScrreen({
+  const AddToOrderScreen({
     super.key,
     required this.name,
     required this.description,
@@ -22,14 +21,19 @@ class AddToOrderScrreen extends StatefulWidget {
   });
 
   @override
-  State<AddToOrderScrreen> createState() => _AddToOrderScrreenState();
+  State<AddToOrderScreen> createState() => _AddToOrderScreenState();
 }
 
-class _AddToOrderScrreenState extends State<AddToOrderScrreen> {
+class _AddToOrderScreenState extends State<AddToOrderScreen> {
   int numOfItems = 1;
 
   @override
   Widget build(BuildContext context) {
+    // Format the price using NumberFormat
+    final NumberFormat currencyFormat = NumberFormat('#,##0', 'vi_VN'); // Vietnamese format
+    String formattedPrice = currencyFormat.format(widget.price);
+    String totalFormattedPrice = currencyFormat.format(widget.price * numOfItems);
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -141,7 +145,7 @@ class _AddToOrderScrreenState extends State<AddToOrderScrreen> {
                           ),
                         );
                       },
-                      child: Text("Add to Order (${(widget.price * numOfItems).toString()} VND)"),
+                      child: Text("Add to Order (${totalFormattedPrice} VND)"), // Use formatted total price
                     ),
                   ],
                 ),

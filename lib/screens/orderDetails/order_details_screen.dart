@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart'; // Import the intl package
 import '../../components/buttons/primary_button.dart';
 import '../../constants.dart';
 import 'check_out.dart';
 import 'components/order_item_card.dart';
 import 'components/price_row.dart';
 import 'components/total_price.dart';
-import 'check_out.dart'; // Import your CheckoutScreen
 
 class OrderDetailsScreen extends StatefulWidget {
-  final List<Map<String, dynamic>> orderedItems; // Accept ordered items
+  final List<Map<String, dynamic>> orderedItems;
 
-  const OrderDetailsScreen({super.key, required this.orderedItems}); // Keep this required
+  const OrderDetailsScreen({super.key, required this.orderedItems});
 
   @override
   _OrderDetailsScreenState createState() => _OrderDetailsScreenState();
@@ -22,12 +22,15 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
   @override
   void initState() {
     super.initState();
-    _currentOrderedItems = List.from(widget.orderedItems); // Initialize current items
+    _currentOrderedItems = List.from(widget.orderedItems);
   }
 
   @override
   Widget build(BuildContext context) {
-    // Calculate subtotal as int
+    // Format the price using NumberFormat
+    final NumberFormat currencyFormat = NumberFormat('#,##0', 'vi_VN');
+
+    // Calculate subtotal
     int subtotal = _currentOrderedItems.fold(0, (sum, item) {
       int price = item['price'] is int ? item['price'] : (item['price'] as num).toInt();
       int numOfItem = item['numOfItem'] is int ? item['numOfItem'] : (item['numOfItem'] as num).toInt();
@@ -52,15 +55,15 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                   child: OrderedItemCard(
                     title: _currentOrderedItems[index]["title"],
                     numOfItem: _currentOrderedItems[index]["numOfItem"],
-                    price: _currentOrderedItems[index]["price"], // Use int price directly
+                    price: _currentOrderedItems[index]["price"],
                   ),
                 ),
               ),
-              PriceRow(text: "Subtotal", price: subtotal), // Update subtotal price
+              PriceRow(text: "Subtotal", price: subtotal), // Pass formatted subtotal
               const SizedBox(height: defaultPadding / 2),
               const PriceRow(text: "Delivery", price: 0),
               const SizedBox(height: defaultPadding / 2),
-              TotalPrice(price: subtotal), // Display the computed subtotal
+              TotalPrice(price: subtotal), // Pass formatted total price
               const SizedBox(height: defaultPadding * 2),
               // Button to get more items
               PrimaryButton(
@@ -71,9 +74,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
               ),
               const SizedBox(height: defaultPadding),
               PrimaryButton(
-                text: "Checkout (${subtotal} VND)", // Display subtotal as int
+                text: "Checkout (${currencyFormat.format(subtotal)} VND)", // Use formatted subtotal
                 press: () {
-                  // Navigate to the CheckoutScreen
                   Navigator.push(
                     context,
                     MaterialPageRoute(

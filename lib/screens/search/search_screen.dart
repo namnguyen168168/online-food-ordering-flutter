@@ -101,7 +101,6 @@ class _SearchScreenState extends State<SearchScreen> {
                       name: _searchResults[index]['name'],
                       rating: (_searchResults[index]['rating']?.toDouble() ?? 0.0),
                       numOfRating: _searchResults[index]['numOfRatings'] ?? 0,
-                      deliveryTime: _searchResults[index]['deliveryTime'] ?? 0,
                       foodType: List<String>.from(_searchResults[index]['cuisineType'].split(', ')),
                       press: () {
                         // Navigate to restaurant detail

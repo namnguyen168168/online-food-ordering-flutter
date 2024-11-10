@@ -93,14 +93,10 @@ class _RestaurantInfoState extends State<RestaurantInfo> {
                 DeliveryInfo(
                   iconSrc: "assets/icons/delivery.svg",
                   text: restaurant!.deliveryInfo,
-                  subText: "Delivery",
+                  subText: "Delivery order on App",
                 ),
                 const SizedBox(width: defaultPadding),
-                DeliveryInfo(
-                  iconSrc: "assets/icons/clock.svg",
-                  text: restaurant!.deliveryTime.toString(),
-                  subText: "Minutes",
-                ),
+
                 const Spacer(),
                 OutlinedButton(
                   onPressed: () {},

@@ -69,7 +69,6 @@ class _BodyState extends State<Body> {
               name: _restaurants[index]['name'] as String,
               rating: (_restaurants[index]['rating'] as num?)?.toDouble() ?? 0.0, // Handle potential null
               numOfRating: (_restaurants[index]['numOfRatings'] as int?) ?? 0, // Handle potential null
-              deliveryTime: (_restaurants[index]['deliveryTime'] as int?) ?? 0, // Handle potential null
               foodType: (_restaurants[index]['cuisineType'] as String).split(', '), // Assuming food types are comma-separated
               press: () {
                 Navigator.push(
