@@ -68,7 +68,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 }
 
-// Demo data for our Onboarding screen
 List<Map<String, dynamic>> demoData = [
   {
     "illustration": "assets/Illustrations/Illustrations_1.svg",
@@ -80,7 +79,7 @@ List<Map<String, dynamic>> demoData = [
     "illustration": "assets/Illustrations/Illustrations_2.svg",
     "title": "Free delivery offers",
     "text":
-        "Free delivery for new customers via Apple Pay\nand others payment methods.",
+        "Free delivery for new customers via VnPay\nand others payment methods.",
   },
   {
     "illustration": "assets/Illustrations/Illustrations_3.svg",

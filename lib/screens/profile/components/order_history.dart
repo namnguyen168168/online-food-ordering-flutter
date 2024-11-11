@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:intl/intl.dart'; // Import the intl package
 
 class OrderHistoryScreen extends StatefulWidget {
   const OrderHistoryScreen({super.key});
@@ -42,10 +43,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
         },
       );
 
-      // Decode the response body using utf8
       final decodedBody = utf8.decode(response.bodyBytes);
-      print('Decoded Response body: $decodedBody');
-
       if (response.statusCode == 200) {
         final data = json.decode(decodedBody);
 
@@ -74,6 +72,11 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     }
   }
 
+  String formatPrice(num price) {
+    final formatter = NumberFormat('#,##0', 'vi_VN');
+    return formatter.format(price);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -99,7 +102,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
-                  Text('Total Price: ${order['totalAmount'] ?? 'N/A'} VND'),
+                  Text('Total Price: ${order['totalPrice'] != null ? '${formatPrice(order['totalPrice'] as num)} VND' : 'N/A'}'),
                   const SizedBox(height: 8),
                   Text('Delivery Address: ${order['deliveryAddress'] != null ? '${order['deliveryAddress']['streetAddress']}, ${order['deliveryAddress']['district']}, ${order['deliveryAddress']['city']}' : 'N/A'}'),
                   const SizedBox(height: 8),
